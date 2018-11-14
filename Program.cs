@@ -16,10 +16,11 @@ namespace WebApp
     {
         public static void Main(string[] args)
         {
-            var isService = !(Debugger.IsAttached || args.Contains("--console"));
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var runAsService = !(Debugger.IsAttached || args.Contains("--console") || environment == "Development");
             var builder = CreateWebHostBuilder(args.Where(arg => arg != "--console").ToArray());
 
-            if (isService)
+            if (runAsService)
             {
                 var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
                 var pathToContentRoot = Path.GetDirectoryName(pathToExe);
@@ -28,7 +29,7 @@ namespace WebApp
 
             var host = builder.Build();
 
-            if (isService)
+            if (runAsService)
             {
                 host.RunAsService();
             }
@@ -40,10 +41,10 @@ namespace WebApp
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((context, config) =>
+                .ConfigureAppConfiguration((hostContext, configBuilder) =>
                 {
-                    // Configure the app here.
-                })
+                    //configure the app here
+                 })
                 .UseStartup<Startup>();
     }
 }

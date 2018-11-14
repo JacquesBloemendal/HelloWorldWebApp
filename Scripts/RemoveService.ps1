@@ -12,7 +12,7 @@ catch [Microsoft.PowerShell.Commands.ServiceCommandException] {
 
 if($removeService -eq $false) {
     Write-Host "The service does not exist."
-    Break
+    Return 0
 }
 
 # Start remove
@@ -22,7 +22,8 @@ try{
     Write-Host "Checking if service needs to be stopped..."
     if($service.Status -ne "Stopped") {
         Write-Host "Stopping service..."
-        $service.Stop()}
+        $service.Stop()
+        $service.WaitForStatus("Stopped", '00:00:30')}
 
     Write-Host "Service is stopped. Removing service..."
     Remove-Service $serviceName }
